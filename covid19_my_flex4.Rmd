@@ -1,6 +1,6 @@
 ---
 title: "Covid19 Situational Analyis"
-author: "Epid Modelling Team"
+author: "Epid. Modelling Team"
 date: "`r Sys.Date()`"
 output: flexdashboard::flex_dashboard
 
