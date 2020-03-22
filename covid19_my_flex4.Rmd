@@ -34,6 +34,9 @@ covid19_query <- data.world::qry_sql(paste0(
   "FROM world_covid19"))
 
 covid19.data <- data.world::query(covid19_query, dataset = covid19)
+covid19.data <- covid19.data %>% 
+  mutate(deaths.to.cases.ratio = total_deaths/total_cases)
+#ref : https://www.medrxiv.org/content/10.1101/2020.02.19.20025163v1.full.pdf+html
 ```
 
 
@@ -87,7 +90,6 @@ Column
 ### Raw data
 
 ```{r}
-#covid19.data.all <- covid19.data %>% filter(location == "Worldwide")
 DT::datatable(covid19.data, options = list(
   pageLength = 15
 ))
@@ -104,7 +106,7 @@ Column
 
 
 ```{r}
-covid19.data.all <- covid19.data %>% filter(location == 'World')
+covid19.data.all <- covid19.data %>% filter(location == 'World') 
 tot_cases <- covid19.data.all %>%
   group_by(date) %>% 
   count(total_cases)
@@ -229,7 +231,8 @@ tot_cases_my <- covid19.data.my %>%
 plot.tot.cases.my <- ggplot(tot_cases_my, aes(x = date, y = total_cases)) +
   geom_line() +
   scale_y_continuous(labels = comma,
-                     breaks = seq(0, max(tot_cases_my$total_cases), 25)) + # change axis from scientific notion to comma style
+                     breaks = seq(0, max(tot_cases_my$total_cases),
+                                  max(tot_cases_my$total_cases)/20)) + # change axis from scientific notion to comma style
   xlab("Date") + ylab("No. of Total Cases") # relabel axis
 ggplotly(plot.tot.cases.my)
 ```
@@ -260,8 +263,11 @@ tot_new_cases_my <- covid19.data.my %>%
 plot.total.new_cases_my <- ggplot(tot_new_cases_my, aes(x = date, y = new_cases)) +
   geom_bar(stat = 'identity')+
   scale_y_continuous(labels = comma,
-                     breaks = seq(0, max(tot_new_cases_my$new_cases, 
-                                         na.rm = T), 10)) + # change axis from scientific notion to comma style
+                     breaks = seq(0, 
+                                  max(tot_new_cases_my$new_cases, 
+                                         na.rm = T), 
+                                  max(tot_new_cases_my$new_cases, 
+                                         na.rm = T)/20)) + # change axis from scientific notion to comma style
   xlab("Date") + ylab("No. of New Cases") 
   
 ggplotly(plot.total.new_cases_my)
@@ -352,9 +358,8 @@ ggplotly(plot.tot.cases.sea)
 ### Total deaths
 
 ```{r}
-plot.total.deaths.sea <- ggplot(covid_sea, aes(x = date, y = total_deaths, colour = location)) +
-  geom_line() +
-  scale_y_continuous(labels = comma) + # change axis from scientific notion to comma style
+plot.total.deaths.sea <- ggplot(covid_sea, aes(x = date, y = total_deaths)) +
+  geom_bar(aes(fill = location), stat = 'identity')+
   xlab("Date") + ylab("No. of Total Deaths") # relabel axis
 ggplotly(plot.total.deaths.sea)
 ```
@@ -377,12 +382,19 @@ ggplotly(plot.total.new_cases_sea)
 
 
 ```{r}
-plot.tot.new_deaths_sea <- ggplot(covid_sea, aes(x = date, y = new_deaths, colour =location)) +
-  geom_line() +
-  scale_y_continuous(labels = comma) + # change axis from scientific notion to comma style
+plot.tot.new_deaths_sea <- ggplot(covid_sea, aes(x = date, y = new_deaths, fill = location)) +
+  geom_bar( stat = 'identity')+
   xlab("Date") + ylab("No. of New Deaths") # relabel axis
 ggplotly(plot.tot.new_deaths_sea)
 ```
 
+<!-- Other stats -->
+<!-- ======================================================================================== -->
 
+<!-- ### Number of days for the number of cases to double  -->
+
+```{r}
+# covid_my <- covid_sea %>% filter(location == 'Malaysia')
+# rate_tot_cases <- covid_my %>% arrange(desc(date)) %>% 
+```
 
